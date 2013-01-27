@@ -32,13 +32,15 @@ if (!class_exists('MagazineIssues')) {
     Class MagazineIssues {
 
         var $pluginOptions = array(
-            'adminPageTitle' => 'Add Magazine Issue',
-            'adminMenuTitle' => 'Issues',
-            'adminCapability' => 'publish_pages',
-            'adminMenuSlug' => 'add_magazine_issue',
-            //'adminPageFunction' => array($this, 'renderAdminPage'),
-            'adminMenuIconUrl' => null,
-            'adminMenuPosition' => 6 // After 'Posts'
+            'adminPageTitle'    => 'Add Magazine Issue',
+            'adminMenuTitle'    => 'Issues',
+            'adminCapability'   => 'publish_pages',
+            'adminMenuSlug'     => 'add_magazine_issue',
+            'adminMenuIconUrl'  => null,
+            'adminMenuPosition' => 6, // After 'Posts'
+
+            'taxonomySlug'      => 'issue',
+            'taxonomy'          => ''
         );
 
         /* Constructor. */
@@ -62,6 +64,39 @@ if (!class_exists('MagazineIssues')) {
                 $this->pluginOptions['adminMenuIconUrl'],
                 $this->pluginOptions['adminMenuPosition']
             );
+        }
+
+        /* Registers a custom 'issue' taxonomy. */
+        function registerIssueTaxonomy() {
+            // $taxonomyLabels = array(
+            //     'name' => 'Issues', //_x( 'Issues', 'taxonomy general name' ),
+            //     'singular_name' => 'Issue', //_x( 'Issue', 'taxonomy singular name' ),
+            //     'search_items' =>  __( 'Search Issues' ),
+            //     'popular_items' => __( 'Popular Issues' ),
+            //     'all_items' => __( 'All Issues' ),
+            //     'parent_item' => null,
+            //     'parent_item_colon' => null,
+            //     'edit_item' => __( 'Edit Issue' ), 
+            //     'update_item' => __( 'Update Issue' ),
+            //     'add_new_item' => __( 'Add New Issue' ),
+            //     'new_item_name' => __( 'New Issue Name' ),
+            //     'separate_items_with_commas' => __( 'Separate issues with commas' ),
+            //     'add_or_remove_items' => __( 'Add or remove issues' ),
+            //     'choose_from_most_used' => __( 'Choose from the most issues' ),
+            //     'menu_name' => __( 'Issues' ),
+            // );
+            register_taxonomy('issue', 'post', array(
+                'hierarchical' => false,
+                'label' => 'Issues',
+                'labels' => array(
+                    'add_new_item' => 'Add New Issue'
+                ),
+                'show_ui' => true,              // TODO
+                'show_admin_column' => true,    // TODO
+                'update_count_callback' => '_update_post_term_count',
+                'query_var' => true,            // TODO
+                'rewrite' => array( 'slug' => 'issue' ),
+            ));
         }
 
         /* Renders the admin page available via the admin menu item. */
