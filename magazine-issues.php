@@ -47,7 +47,7 @@ if (!class_exists('MagazineIssues')) {
         }
 
         /* This is run on plugin activation. */
-        function init() {
+        function activate() {
             // nothing yet
         }
 
@@ -66,7 +66,13 @@ if (!class_exists('MagazineIssues')) {
 
         /* Renders the admin page available via the admin menu item. */
         function renderAdminPage() {
-            //
+            if (sizeof($_POST) == 0) {
+                // Render the form
+                include_once('php/magazine-issues-admin.html.php');
+            } else {
+                // The user has POSTed the form!
+                print_r($_POST);
+            }
         }
     }
 }
@@ -77,8 +83,13 @@ if (class_exists('MagazineIssues')) {
 
 if (isset($magazineIssuesPlugin)) {
     // Actions
-    add_action('activate_magazine-issues/magazine-issues.php', array(&$magazineIssuesPlugin, 'init'));
-    add_action( 'admin_menu', array(&$magazineIssuesPlugin, 'addAdminMenuItem'));
+
+    // Activation of plugin (once)
+    add_action('activate_magazine-issues/magazine-issues.php', array(&$magazineIssuesPlugin, 'activate'));
+    // Admin menu item
+    add_action('admin_menu', array(&$magazineIssuesPlugin, 'addAdminMenuItem'));
+    // On each loop
+    add_action('init', array(&$magazineIssuesPlugin, 'registerIssueTaxonomy'));
 }
 
 
