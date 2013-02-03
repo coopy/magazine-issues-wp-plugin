@@ -34,6 +34,14 @@ License: GPL2
     - Create workflow (rename Issues, remove Issue Covers
     - Make options for issue, issue-cover slugs
 */
+
+    function dump($what) {
+        print('<pre>');
+        print_r($what);
+        print('</pre>');
+    }
+
+
 if (!class_exists('MagazineIssues')) {
     Class MagazineIssues {
 
@@ -72,6 +80,19 @@ if (!class_exists('MagazineIssues')) {
             );
         }
 
+        /* Validates the data POSTed from the Magazine Issue admin interface */
+        function validateAdminFormPost($postData) {
+            $fields = array('magazineIssueTerm', 'magazineIssueTitle');
+            $validPost = true;
+            foreach($fields as $field) {
+                if (!isset($postData[$field]) || strlen(trim($postData[$field])) === 0) {
+                    $validPost = false;
+                    break;
+                }
+            }
+            return $validPost;
+        }
+
         /* Registers a custom 'issue' taxonomy. */
         function registerIssueTaxonomy() {
             $taxonomyLabels = array(
@@ -92,7 +113,7 @@ if (!class_exists('MagazineIssues')) {
                 'menu_name' => __('Issues'),
             );
             $args = array(
-                'hierarchical' => true,
+                'hierarchical' => false,
                 'label' => 'Issues',
                 'labels' => $taxonomyLabels,
                 'show_ui' => true,
@@ -132,7 +153,7 @@ if (!class_exists('MagazineIssues')) {
                 'public' => true,
                 'publicly_queryable' => true,
                 'show_ui' => true,
-                'show_in_menu' => true,
+                'show_in_menu' => false,
                 'query_var' => true,
                 'rewrite' => array( 'slug' => 'issue-cover' ),
                 'capability_type' => 'post',
@@ -148,14 +169,44 @@ if (!class_exists('MagazineIssues')) {
 
         /* Renders the admin page available via the admin menu item. */
         function renderAdminPage() {
-            if (sizeof($_POST) == 0) {
-                // Render the form
-                print_r($_GET);
-                include_once('php/magazine-issues-admin.html.php');
-            } else {
+            if (sizeof($_POST) > 0) {
                 // The user has POSTed the form!
-                print_r($_POST);
+                $error = $this->handleAdminPost($_POST);
+                if (is_wp_error($error)) {
+                    print('<span class="error">Error: ' . $error->get_error_message() . '</span>');
+                } else {
+                    print('Success!');
+                }
             }
+            // Render the form
+            include_once('php/magazine-issues-admin.html.php');
+        }
+
+        function handleAdminPost($postData) {
+            if (!$this->validateAdminFormPost($postData)) {
+                return new WP_Error('invalid_post_data', "Please enter both a title and a term name for the issue.");
+            }
+            $post;
+            $postId;
+            $postTitle = trim($postData['magazineIssueTitle']);
+            $term;
+            $termId;
+            $termName = trim($postData['magazineIssueTerm']);
+
+            if (term_exists($termName, 'issue')) {
+                return new WP_Error('term_exists', "The issue \"{$termName}\" already exists. Please choose a unique name.");
+            }
+            $post = array(
+                'post_title' => $postTitle,
+                'post_type' => 'issue_cover'
+            );
+            $postId = wp_insert_post($post);
+            $result = wp_set_object_terms($postId, $termName, 'issue', false);
+            if (is_wp_error($result)) {
+                return $result;
+            }
+
+            return $postTitle;
         }
     }
 }
