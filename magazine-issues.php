@@ -31,8 +31,8 @@ License: GPL2
 
 /*
     TODO
-    - Create workflow (rename Issues, remove Issue Covers
-    - Make options for issue, issue-cover slugs
+    - Make options for issue slug & issue-cover slug
+    - DONE Create workflow (rename Issues, remove Issue Covers
 */
 
     function dump($what) {
@@ -171,11 +171,11 @@ if (!class_exists('MagazineIssues')) {
         function renderAdminPage() {
             if (sizeof($_POST) > 0) {
                 // The user has POSTed the form!
-                $error = $this->handleAdminPost($_POST);
-                if (is_wp_error($error)) {
+                $result = $this->handleAdminPost($_POST);
+                if (is_wp_error($result)) {
                     print('<span class="error">Error: ' . $error->get_error_message() . '</span>');
                 } else {
-                    print('Success!');
+                    print("<span class=\"success\">Created new Issue Cover: {$result}</span>");
                 }
             }
             // Render the form
