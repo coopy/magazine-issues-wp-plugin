@@ -1,3 +1,39 @@
+<?php
+    $issueColl;
+    function getIssues() {
+        // Populate issue collection
+        if (!isset($issueColl) || count($issueColl) === 0) {
+            $issueColl = array();
+            $issues = get_terms('issue', array(
+                'orderby'=>'id',
+                'order' => 'DESC',
+                'hide_empty' => false));
+            foreach($issues as $issue) {
+                $postArgs = array(
+                    'post_type' => 'issue_cover',
+                    'post_status' => array('publish', 'draft', 'pending'),
+                    'tax_query' => array(array(
+                        'taxonomy' => 'issue',
+                        'field' => 'slug',
+                        'terms' => $issue->slug,
+                        'operator' => 'IN'
+                    ))
+                );
+                $posts = get_posts($postArgs);
+                $post;
+                if (count($posts) > 0) {
+                    $post = $posts[0];
+                }
+                // Push a collection entry
+                $issueColl[] = array(
+                    'issue_tag'   => $issue,
+                    'issue_cover' => $post
+                );
+            }
+        }
+        return $issueColl;
+    }
+?>
 <style type="text/css">
 section {
     margin-bottom: 3em;
@@ -54,31 +90,11 @@ section {
             <tr><th>Cover Title</th><th>Issue Tag</th></tr>
         <?php
             // Print out edit links to existing issue posts and terms
-            $issues = get_terms('issue', array(
-                'orderby'=>'id',
-                'order' => 'DESC',
-                'hide_empty' => false));
-            // dump($issues);
+            $issues = getIssues();
             foreach($issues as $issue) {
-                // dump($issue);
-                $postArgs = array(
-                    'post_type' => 'issue_cover',
-                    'post_status' => array('publish', 'draft', 'pending'),
-                    'tax_query' => array(array(
-                        'taxonomy' => 'issue',
-                        'field' => 'slug',
-                        'terms' => $issue->slug,
-                        'operator' => 'IN'
-                    ))
-                );
-                $posts = get_posts($postArgs);
-                // if (count($posts) !== 1) {
-                //  $error = new WP_Error('no_issue_cover', "Couldn't find a cover post for issue {$issue->name}");
-                //  print($error->get_error_message());
-                // }
-                $post = $posts[0];
+                $tag = $issue['issue_tag'];
+                $post = $issue['issue_cover'];
                 if ($post) {
-                    // dump($post);
                     $unPublished = '';
                     if ($post->post_status !== 'publish') {
                         $unPublished = ' <em>(not published)</em>';
@@ -91,9 +107,8 @@ section {
                     $newPostPath = 'post-new.php?post_type=issue_cover';
                     $editPostAnchor = '<em><a href="' . admin_url($newPostPath) . '">Create Issue Cover</a></em>';
                 }
-                // dump($posts);
-                $editTermPath = 'edit-tags.php?action=edit&taxonomy=issue&tag_ID=' . $issue->term_id;
-                $editTermAnchor = '<a title="Edit Issue Tag" href="' . admin_url($editTermPath) . '">' . $issue->name . '</a>';
+                $editTermPath = 'edit-tags.php?action=edit&taxonomy=issue&tag_ID=' . $tag->term_id;
+                $editTermAnchor = '<a title="Edit Issue Tag" href="' . admin_url($editTermPath) . '">' . $tag->name . '</a>';
                 print('<tr>');
                 print('<td>' . $editPostAnchor . '</td>');
                 print('<td>' . $editTermAnchor . '</td>');
