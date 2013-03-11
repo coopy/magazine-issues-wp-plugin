@@ -1,6 +1,6 @@
 <?php
     $issueColl;
-    function getIssues() {
+    function MagazineIssues_getIssues() {
         // Populate issue collection
         if (!isset($issueColl) || count($issueColl) === 0) {
             $issueColl = array();
@@ -90,7 +90,7 @@ section {
             <tr><th>Cover Title</th><th>Issue Tag</th></tr>
         <?php
             // Print out edit links to existing issue posts and terms
-            $issues = getIssues();
+            $issues = MagazineIssues_getIssues();
             foreach($issues as $issue) {
                 $tag = $issue['issue_tag'];
                 $post = $issue['issue_cover'];
@@ -124,9 +124,11 @@ section {
                 <p>Change which issue the "Current Issue" menu item links to.</p>
                 <div class="form-control">
                     <select name="currentMagazineIssue">
-                        <option value="1">Issue 1</option>
-                        <option value="2">Issue 2</option>
-                        <option value="3">Issue 3</option>
+                        <?php foreach($issues as $issue) {
+                            $tag = $issue['issue_tag'];
+                            $post = $issue['issue_post'];
+                            print('<option value="' . $post->ID . '">' . $tag->name . '</option>');
+                        }?>
                     </select>
                 </div>
                 <div class="form-control">
