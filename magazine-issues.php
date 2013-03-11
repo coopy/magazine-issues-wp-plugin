@@ -81,7 +81,7 @@ if (!class_exists('MagazineIssues')) {
         }
 
         /* Validates the data POSTed from the Magazine Issue admin interface */
-        function validateAdminFormPost($postData) {
+        function validateNewIssuePostData($postData) {
             $fields = array('magazineIssueTerm', 'magazineIssueTitle');
             $validPost = true;
             foreach($fields as $field) {
@@ -171,7 +171,7 @@ if (!class_exists('MagazineIssues')) {
         function renderAdminPage() {
             if (sizeof($_POST) > 0) {
                 // The user has POSTed the form!
-                $result = $this->handleAdminPost($_POST);
+                $result = $this->processPostback($_POST);
                 if (is_wp_error($result)) {
                     print('<span class="error">Error: ' . $error->get_error_message() . '</span>');
                 } else {
@@ -182,8 +182,15 @@ if (!class_exists('MagazineIssues')) {
             include_once('php/magazine-issues-admin.html.php');
         }
 
-        function handleAdminPost($postData) {
-            if (!$this->validateAdminFormPost($postData)) {
+        function detectAdminPostbackType($postData) {
+            if (isset($postData['magazineIssueCurrent'])) {
+                return 'change_current_issue';
+            }
+            return 'new_issue';
+        }
+
+        function handleNewIssuePostback($postData) {
+            if (!$this->validateNewIssuePostData($postData)) {
                 return new WP_Error('invalid_post_data', "Please enter both a title and a term name for the issue.");
             }
             $post;
@@ -207,6 +214,19 @@ if (!class_exists('MagazineIssues')) {
             }
 
             return $postTitle;
+        }
+
+        function handleChangeCurrentIssuePostback($postData) {
+            dump($postData);
+        }
+
+        function processPostback($postData) {
+            $type = $this->detectAdminPostbackType($postData);
+            if ($type == 'new_issue') {
+                return $this->handleNewIssuePostback($postData);
+            } else if ($type == 'change_current_issue') {
+                return $this->handleChangeCurrentIssuePostback($postData);
+            }
         }
     }
 }

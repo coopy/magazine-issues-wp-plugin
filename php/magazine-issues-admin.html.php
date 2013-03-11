@@ -33,6 +33,16 @@
         }
         return $issueColl;
     }
+
+    function getIssueCoverNavPostID() {
+        $postArgs = array(
+            'post_type' => 'nav_menu_item',
+            'name' => 'current-issue',
+            'numberposts' => 1
+        );
+        $posts = get_posts($postArgs);
+        return $posts[0]->ID;
+    }
 ?>
 <style type="text/css">
 section {
@@ -123,17 +133,23 @@ section {
         <form method="POST" action="<?php echo $_SERVER["REQUEST_URI"]; ?>">
                 <p>Change which issue the "Current Issue" menu item links to.</p>
                 <div class="form-control">
-                    <select name="currentMagazineIssue">
-                        <?php foreach($issues as $issue) {
-                            $tag = $issue['issue_tag'];
-                            $post = $issue['issue_post'];
-                            print('<option value="' . $post->ID . '">' . $tag->name . '</option>');
-                        }?>
+                    <select name="magazineIssueCurrent">
+                <?php
+                    $navItemID = getIssueCoverNavPostID();
+                    $currentIssueID = get_metadata('post', $navItemID, '_menu_item_object_id');
+                    $currentIssueID = $currentIssueID[0];
+                    foreach($issues as $issue) {
+                        $tag = $issue['issue_tag'];
+                        $post = $issue['issue_cover'];
+                        $selected = ($currentIssueID == $post->ID) ? ' selected="true"' : '';
+                        print('<option name="magazineIssueCurrent" value="' . $post->ID . '"' . $selected . '>' . $tag->name . '</option>');
+                    }
+                ?>
                     </select>
                 </div>
                 <div class="form-control">
-                    <button onclick="javascript:return false;">Change Current Issue</button>
-                    <!--<input type="submit" value="Change Current Issue"/> -->
+                    <!--<button onclick="javascript:return false;">Change Current Issue</button> -->
+                    <input type="submit" value="Change Current Issue"/>
                 </div>
         </form>
     </section>
