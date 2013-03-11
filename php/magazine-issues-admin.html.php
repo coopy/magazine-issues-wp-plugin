@@ -1,5 +1,6 @@
 <?php
     $issueColl;
+    //@TODO move to static method
     function MagazineIssues_getIssues() {
         // Populate issue collection
         if (!isset($issueColl) || count($issueColl) === 0) {
@@ -32,16 +33,6 @@
             }
         }
         return $issueColl;
-    }
-
-    function getIssueCoverNavPostID() {
-        $postArgs = array(
-            'post_type' => 'nav_menu_item',
-            'name' => 'current-issue',
-            'numberposts' => 1
-        );
-        $posts = get_posts($postArgs);
-        return $posts[0]->ID;
     }
 ?>
 <style type="text/css">
@@ -135,14 +126,16 @@ section {
                 <div class="form-control">
                     <select name="magazineIssueCurrent">
                 <?php
-                    $navItemID = getIssueCoverNavPostID();
+                    $navItemID = MagazineIssues::getIssueCoverNavPostID();
                     $currentIssueID = get_metadata('post', $navItemID, '_menu_item_object_id');
                     $currentIssueID = $currentIssueID[0];
                     foreach($issues as $issue) {
                         $tag = $issue['issue_tag'];
                         $post = $issue['issue_cover'];
-                        $selected = ($currentIssueID == $post->ID) ? ' selected="true"' : '';
-                        print('<option name="magazineIssueCurrent" value="' . $post->ID . '"' . $selected . '>' . $tag->name . '</option>');
+                        if ($post->post_status == 'publish') {
+                            $selected = ($currentIssueID == $post->ID) ? ' selected="true"' : '';
+                            print('<option name="magazineIssueCurrent" value="' . $post->ID . '"' . $selected . '>' . $tag->name . '</option>');
+                        }
                     }
                 ?>
                     </select>

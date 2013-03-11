@@ -217,7 +217,8 @@ if (!class_exists('MagazineIssues')) {
         }
 
         function handleChangeCurrentIssuePostback($postData) {
-            dump($postData);
+            $postID = $postData['magazineIssueCurrent'];
+            self::setCurrentIssuePostID($postID);
         }
 
         function processPostback($postData) {
@@ -227,6 +228,31 @@ if (!class_exists('MagazineIssues')) {
             } else if ($type == 'change_current_issue') {
                 return $this->handleChangeCurrentIssuePostback($postData);
             }
+        }
+
+        private static function getIssueCoverNavPostID() {
+            $postArgs = array(
+                'post_type' => 'nav_menu_item',
+                'name' => 'current-issue',
+                'numberposts' => 1
+            );
+            $posts = get_posts($postArgs);
+            return $posts[0]->ID;
+        }
+
+        public static function getCurrentIssuePostID() {
+            $currentIssueID = get_metadata('post',
+                                           self::getIssueCoverNavPostID(),
+                                           '_menu_item_object_id');
+            return $currentIssueID[0];
+        }
+
+        private static function setCurrentIssuePostID($postID) {
+            update_metadata('post',
+                            self::getIssueCoverNavPostID(),
+                            '_menu_item_object_id',
+                            $postID,
+                            self::getCurrentIssuePostID());
         }
     }
 }
