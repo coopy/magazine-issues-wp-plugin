@@ -88,7 +88,7 @@ section {
     <section>
         <h2>Existing Issues</h2>
         <table class="existing-issues">
-            <tr><th>Cover Title</th><th>Issue Tag</th></tr>
+            <tr><th>Cover Title</th><th>Issue Tag</th><th>Edit Cover</th><th>View Cover Page</th></tr>
         <?php
             // Print out edit links to existing issue posts and terms
             $issues = MagazineIssues_getIssues();
@@ -102,17 +102,19 @@ section {
                     }
                     $postTitle = $post->post_title;
                     $editPostPath = 'post.php?post=' . $post->ID . '&action=edit';
-                    $editPostAnchor = '<a title="Edit Issue Cover" href="' . admin_url($editPostPath) . '">' . $postTitle . '</a>' . $unPublished;
+                    $editPostAnchor = '<a title="Edit Issue Cover" href="' . admin_url($editPostPath) . '">Edit</a>';
+                    $viewPostAnchor = '<a title="View Issue Cover" href="/issue/' . $tag->slug . '">View</a>';
                 } else {
                     $postTitle = 'No Issue Cover found';
                     $newPostPath = 'post-new.php?post_type=issue_cover';
                     $editPostAnchor = '<em><a href="' . admin_url($newPostPath) . '">Create Issue Cover</a></em>';
+                    $viewPostAnchor = '';
                 }
-                $editTermPath = 'edit-tags.php?action=edit&taxonomy=issue&tag_ID=' . $tag->term_id;
-                $editTermAnchor = '<a title="Edit Issue Tag" href="' . admin_url($editTermPath) . '">' . $tag->name . '</a>';
                 print('<tr>');
+                print('<td>' . $postTitle . $unPublished . '</td>');
+                print('<td>' . $tag->name . '</td>');
                 print('<td>' . $editPostAnchor . '</td>');
-                print('<td>' . $editTermAnchor . '</td>');
+                print('<td>' . $viewPostAnchor . '</td>');
                 print('</tr>');
             }
         ?>
