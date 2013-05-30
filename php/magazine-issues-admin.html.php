@@ -128,15 +128,16 @@ section {
                 <div class="form-control">
                     <select name="magazineIssueCurrent">
                 <?php
-                    $navItemID = MagazineIssues::getIssueCoverNavPostID();
+                    $navItemID = MagazineIssues::getCurrentIssueNavItemPostID();
                     $currentIssueID = get_metadata('post', $navItemID, '_menu_item_object_id');
                     $currentIssueID = $currentIssueID[0];
                     foreach($issues as $issue) {
                         $tag = $issue['issue_tag'];
                         $post = $issue['issue_cover'];
+                        // Only show an issue as an option if the cover is published.
                         if ($post->post_status == 'publish') {
-                            $selected = ($currentIssueID == $post->ID) ? ' selected="true"' : '';
-                            print('<option name="magazineIssueCurrent" value="' . $post->ID . '"' . $selected . '>' . $tag->name . '</option>');
+                            $selected = ($currentIssueID == $tag->term_id) ? ' selected="true"' : '';
+                            print('<option name="magazineIssueCurrent" value="' . $tag->term_id . '"' . $selected . '>' . $tag->name . '</option>');
                         }
                     }
                 ?>

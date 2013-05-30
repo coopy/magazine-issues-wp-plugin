@@ -232,7 +232,7 @@ if (!class_exists('MagazineIssues')) {
             }
         }
 
-        private static function getIssueCoverNavPostID() {
+        private static function getCurrentIssueNavItemPostID() {
             $postArgs = array(
                 'post_type' => 'nav_menu_item',
                 'name' => 'current-issue',
@@ -242,19 +242,19 @@ if (!class_exists('MagazineIssues')) {
             return $posts[0]->ID;
         }
 
-        public static function getCurrentIssuePostID() {
+        public static function getCurrentIssueTermID() {
             $currentIssueID = get_metadata('post',
-                                           self::getIssueCoverNavPostID(),
+                                           self::getCurrentIssueNavItemPostID(),
                                            '_menu_item_object_id');
             return $currentIssueID[0];
         }
 
         private static function setCurrentIssuePostID($postID) {
             update_metadata('post',
-                            self::getIssueCoverNavPostID(),
+                            self::getCurrentIssueNavItemPostID(),
                             '_menu_item_object_id',
                             $postID,
-                            self::getCurrentIssuePostID());
+                            self::getCurrentIssueTermID());
         }
     }
 }
