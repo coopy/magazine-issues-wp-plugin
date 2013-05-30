@@ -176,7 +176,7 @@ if (!class_exists('MagazineIssues')) {
                 if (is_wp_error($result)) {
                     print('<span class="error">Error: ' . $error->get_error_message() . '</span>');
                 } else {
-                    print("<span class=\"success\">Created new Issue Cover: {$result}</span>");
+                    print("<span class=\"success\">{$result}</span>");
                 }
             }
             // Render the form
@@ -214,12 +214,13 @@ if (!class_exists('MagazineIssues')) {
                 return $result;
             }
 
-            return $postTitle;
+            return "Created new Issue Cover: $postTitle";
         }
 
         function handleChangeCurrentIssuePostback($postData) {
             $postID = $postData['magazineIssueCurrent'];
             self::setCurrentIssuePostID($postID);
+            return "Changed Current Issue.";
         }
 
         function processPostback($postData) {
