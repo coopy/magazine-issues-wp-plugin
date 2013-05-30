@@ -31,8 +31,9 @@ License: GPL2
 
 /*
     TODO
-    - Make options for issue slug & issue-cover slug
-    - DONE Create workflow (rename Issues, remove Issue Covers
+    - Make options for:
+      - current-issue nav menu slug;
+      - issue slug & issue-cover slug
 */
 
     function dump($what) {
