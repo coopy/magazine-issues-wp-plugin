@@ -6,7 +6,7 @@ Description: Use this plugin to manage and create Magazine Issues.
     It will create a new Issue taxonomy and a new Page for the issue,
     list Posts under that Issue on the Issue page,
     and change the "Current Issue" link to point to this new Page.
-Version: 0.0.1
+Version: 0.1.0
 Author: Per Nilsson
 Author URI: http://sproutlab.com
 License: GPL2
